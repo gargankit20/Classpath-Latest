@@ -376,7 +376,6 @@ class SnapshotUtils: NSObject {
         paramchatsMessages.setValue(false, forKey:keyViewFlag)
         
         let key = ref.child(nodeNotifications).child(receiverId).childByAutoId().key
-        print(key)
         let Note = ["FromUid": uid,
                     "ToUid": receiverId,
                     "message": message,
@@ -394,7 +393,7 @@ class SnapshotUtils: NSObject {
                 }
                 
                 if notificationState || !(message.contains("A new listing")) {
-                    let childUpdates = ["/Notifications/\(receiverId)/\(key)": Note]
+                    let childUpdates = ["/Notifications/\(receiverId)/\(key ?? "")": Note]
                     ref.updateChildValues(childUpdates)
                     
                     if let fcmToken = (snapshot.value as! NSDictionary)[keyDeviceToken] as? String {
@@ -463,10 +462,9 @@ class SnapshotUtils: NSObject {
                     let listingLocation=CLLocation(latitude:listingLatitude, longitude:listingLongitude)
                     // print("lat current = \(self.latCurrent)")
                     let distance = listingLocation.distance(from: latLIST) / 1609.34
-                    
                     if (distance < 30) {
                         print(child as! DataSnapshot)
-                          let message = "Hi \(user)! There’s a new listing \"\(listingName)\" in \(utils.listingCity). Check it out!"
+                          let message = "Hey "+user.trimmingCharacters(in:.whitespacesAndNewlines)+"! There’s a new listing \""+listingName.trimmingCharacters(in:.whitespacesAndNewlines)+"\" in your area. Check it out!"
                           snapUtils.SendNotification(receiverId : (child as! DataSnapshot).key, message : message, timeStamp : NSDate().timeIntervalSince1970, listingId: listingId)
                     }
                 }

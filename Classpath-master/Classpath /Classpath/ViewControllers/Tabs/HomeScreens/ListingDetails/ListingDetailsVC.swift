@@ -199,7 +199,8 @@ class ListingDetailsVC: UIViewController,UICollectionViewDelegate,UICollectionVi
     func setDetailsData()  {
         let image = model.images[0] as! String
         if image != "" {
-            imgListingImage.sd_setImage(with:URL(string:image), placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
+            let storageRef=Storage.storage().reference(forURL:image)
+            imgListingImage.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
         }else{
              self.imgListingImage.image = #imageLiteral(resourceName: "ic_listing_default")
         }
@@ -552,7 +553,8 @@ class ListingDetailsVC: UIViewController,UICollectionViewDelegate,UICollectionVi
             cell.btnPlay.isHidden = false
             cell.btnPlay.addTarget(self, action: #selector(self.onClick_btnPlay(_:)), for: .touchUpInside)
         }else{
-            cell.imageListing.sd_setImage(with:URL(string:model.images[indexPath.row] as! String), placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
+            let storageRef=Storage.storage().reference(forURL:model.images[indexPath.row] as! String)
+            cell.imageListing.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
             cell.btnPlay.isHidden = true
         }
         return cell

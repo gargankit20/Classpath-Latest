@@ -174,7 +174,7 @@ class SubmitReviewPopUp: UIViewController,UITextFieldDelegate,UIGestureRecognize
             param1.setValue(Rate_listing.value, forKey: keyStars)
             param1.setValue(NSDate().timeIntervalSince1970, forKey: keyDate)
             
-            let reviewInstance1 = self.ref.child(nodeReviews).child(key2)
+            let reviewInstance1 = self.ref.child(nodeReviews).child(key2!)
             reviewInstance1.updateChildValues(param1 as! [AnyHashable : Any])
             
             let _ = self.ref.child(nodeListings).queryOrderedByKey().queryEqual(toValue: self.listingid).observe(.childAdded, with: { snapshot in

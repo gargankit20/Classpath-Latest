@@ -183,7 +183,6 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
   }
 
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    
     let item = items[(indexPath as NSIndexPath).item]
 
     if let selectedItem = cart.video , selectedItem == item {

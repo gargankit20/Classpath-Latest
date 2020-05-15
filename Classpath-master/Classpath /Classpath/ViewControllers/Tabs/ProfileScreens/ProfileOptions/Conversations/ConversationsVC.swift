@@ -245,7 +245,8 @@ extension  ConversationsVC : UITableViewDelegate, UITableViewDataSource
         
         if(userObj.oponentPic != "")
         {
-            cell.imgProfilePic.sd_setImage(with:URL(string:userObj.oponentPic), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+            let storageRef=Storage.storage().reference(forURL:userObj.oponentPic as String)
+            cell.imgProfilePic.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
         }else{
             cell.imgProfilePic.image = #imageLiteral(resourceName: "ic_profile_default")
         }

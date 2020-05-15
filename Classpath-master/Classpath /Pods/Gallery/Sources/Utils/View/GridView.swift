@@ -40,7 +40,7 @@ class GridView: UIView {
     }
 
     [bottomBlurView, doneButton].forEach {
-      bottomView.addSubview($0 as! UIView)
+        bottomView.addSubview($0)
     }
 
     Constraint.on(
@@ -154,7 +154,7 @@ class GridView: UIView {
   }
 
   private func makeLoadingIndicator() -> UIActivityIndicatorView {
-    let view = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let view = UIActivityIndicatorView(style: .whiteLarge)
     view.color = .gray
     view.hidesWhenStopped = true
 

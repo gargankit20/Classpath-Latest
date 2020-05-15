@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import "FIRMessaging.h"
+#import <FirebaseMessaging/FIRMessaging.h>
 
 @class FIRMessagingClient;
 @class FIRMessagingPubSub;
@@ -27,9 +27,12 @@ typedef NS_ENUM(int8_t, FIRMessagingNetworkStatus) {
 
 FOUNDATION_EXPORT NSString *const kFIRMessagingPlistAutoInitEnabled;
 FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyAutoInitEnabled;
+FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyUseMessagingDelegate;
+FOUNDATION_EXPORT NSString *const kFIRMessagingPlistUseMessagingDelegate;
 
 @interface FIRMessagingRemoteMessage ()
 
+@property(nonatomic, copy) NSString *messageID;
 @property(nonatomic, strong) NSDictionary *appData;
 
 @end
@@ -38,9 +41,6 @@ FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyAutoInitEnabled;
 
 #pragma mark - Private API
 
-// The data collection flag from Core.
-@property(nonatomic, readwrite, getter=isGlobalAutomaticDataCollectionEnabled) BOOL globalAutomaticDataCollectionEnabled;
-
 - (NSString *)defaultFcmToken;
 - (FIRMessagingClient *)client;
 - (FIRMessagingPubSub *)pubsub;
@@ -48,10 +48,10 @@ FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyAutoInitEnabled;
 // Create a sample message to be sent over the wire using FIRMessaging. Look at
 // FIRMessagingService.h to see what each param signifies.
 + (NSMutableDictionary *)createFIRMessagingMessageWithMessage:(NSDictionary *)message
-                                                  to:(NSString *)to
-                                              withID:(NSString *)msgID
-                                          timeToLive:(int64_t)ttl
-                                               delay:(int)delay;
+                                                           to:(NSString *)to
+                                                       withID:(NSString *)msgID
+                                                   timeToLive:(int64_t)ttl
+                                                        delay:(int)delay;
 
 - (BOOL)isNetworkAvailable;
 - (FIRMessagingNetworkStatus)networkType;

@@ -88,7 +88,8 @@ class ReportDetailVC: UIViewController,NVActivityIndicatorViewable {
             placeholder = #imageLiteral(resourceName: "ic_listing_default")
         }
         if profileImage != "" {
-            img.sd_setImage(with:URL(string:profileImage), placeholderImage:placeholder)
+            let storageRef=Storage.storage().reference(forURL:profileImage as String)
+            img.sd_setImage(with:storageRef, placeholderImage:placeholder)
         }else {
             self.img.image = placeholder
         }

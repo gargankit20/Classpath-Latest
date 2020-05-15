@@ -9,11 +9,12 @@
 #import "STPFormTextField.h"
 
 #import "NSString+Stripe.h"
+#import "STPLocalizationUtils.h"
 #import "STPCardValidator.h"
 #import "STPCardValidator+Private.h"
 #import "STPDelegateProxy.h"
 #import "STPPhoneNumberValidator.h"
-#import "STPWeakStrongMacros.h"
+#import "STPStringUtils.h"
 
 @interface STPTextFieldDelegateProxy : STPDelegateProxy<UITextFieldDelegate>
 @property (nonatomic, assign) STPFormTextFieldAutoFormattingBehavior autoformattingBehavior;
@@ -53,8 +54,7 @@
     if (deleting) {
         NSString *sanitized = [self unformattedStringForString:textField.text];
         inputText = [sanitized stp_safeSubstringToIndex:sanitized.length - 1];
-    }
-    else {
+    } else {
         NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
         // Removes any disallowed characters from the whole string.
         // If we (incorrectly) allowed a space to start the text entry hoping it would be a
@@ -133,8 +133,7 @@ typedef NSAttributedString* (^STPFormTextTransformationBlock)(NSAttributedString
                     return [inputString copy];
                 }
                 NSMutableAttributedString *attributedString = [inputString mutableCopy];
-                STPCardBrand currentBrand = [STPCardValidator brandForNumber:attributedString.string];
-                NSArray<NSNumber *> *cardNumberFormat = [STPCardValidator cardNumberFormatForBrand:currentBrand];
+                NSArray<NSNumber *> *cardNumberFormat = [STPCardValidator cardNumberFormatForCardNumber:attributedString.string];
 
                 NSUInteger index = 0;
                 for (NSNumber *segmentLength in cardNumberFormat) {
@@ -153,14 +152,14 @@ typedef NSAttributedString* (^STPFormTextTransformationBlock)(NSAttributedString
             };
             break;
         case STPFormTextFieldAutoFormattingBehaviorPhoneNumbers: {
-            WEAK(self);
+            __weak typeof(self) weakSelf = self;
             self.textFormattingBlock = ^NSAttributedString *(NSAttributedString *inputString) {
                 if (![STPCardValidator stringIsNumeric:inputString.string]) {
                     return [inputString copy];
                 }
-                STRONG(self);
+                __strong typeof(self) strongSelf = weakSelf;
                 NSString *phoneNumber = [STPPhoneNumberValidator formattedSanitizedPhoneNumberForString:inputString.string];
-                NSDictionary *attributes = [[self class] attributesForAttributedString:inputString];
+                NSDictionary *attributes = [[strongSelf class] attributesForAttributedString:inputString];
                 return [[NSAttributedString alloc] initWithString:phoneNumber attributes:attributes];
             };
             break;
@@ -208,6 +207,31 @@ typedef NSAttributedString* (^STPFormTextTransformationBlock)(NSAttributedString
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+// accessibilityAttributedValue is only defined on iOS 11 and up, but we
+// implement it immediately below, so we should just ignore the warning.
+- (NSString *)accessibilityValue {
+    return [[self accessibilityAttributedValue] string];
+}
+#pragma clang diagnostic pop
+
+- (NSAttributedString *)accessibilityAttributedValue {
+    NSMutableAttributedString *attributedString = [self.attributedText mutableCopy];
+    #ifdef __IPHONE_13_0
+    if (@available(iOS 13.0, *)) {
+        [attributedString addAttribute:UIAccessibilitySpeechAttributeSpellOut value:@(YES) range:NSMakeRange(0, [attributedString length])];
+    }
+    #endif
+    if (!self.validText) {
+        NSString *invalidData = STPLocalizedString(@"Invalid data.", @"Spoken during VoiceOver when a form field has failed validation.");
+        NSMutableAttributedString *failedString = [[NSMutableAttributedString alloc] initWithString:invalidData attributes:@{UIAccessibilitySpeechAttributePitch: @(0.6)}];
+        [failedString appendAttributedString:attributedString];
+        attributedString = failedString;
+    }
+    return attributedString;
+}
+
 - (void)setAttributedPlaceholder:(NSAttributedString *)attributedPlaceholder {
     NSAttributedString *transformed = self.textFormattingBlock ? self.textFormattingBlock(attributedPlaceholder) : attributedPlaceholder;
     [super setAttributedPlaceholder:transformed];
@@ -236,6 +260,8 @@ typedef NSAttributedString* (^STPFormTextTransformationBlock)(NSAttributedString
 - (void)paste:(id)sender {
     if (self.preservesContentsOnPaste) {
         [super paste:sender];
+    } else if (self.autoFormattingBehavior == STPFormTextFieldAutoFormattingBehaviorExpiration) {
+        self.text = [STPStringUtils expirationDateStringFromString:[UIPasteboard generalPasteboard].string];
     } else {
         self.text = [UIPasteboard generalPasteboard].string;
     }

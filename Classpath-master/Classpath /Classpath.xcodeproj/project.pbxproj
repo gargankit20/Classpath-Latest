@@ -190,8 +190,8 @@
 		075DD90314AFFCEF7BB85BC3 /* Pods-ClasspathUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ClasspathUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ClasspathUITests/Pods-ClasspathUITests.release.xcconfig"; sourceTree = "<group>"; };
 		26BE091B654D98FF9A75E17F /* Pods-Classpath.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Classpath.release.xcconfig"; path = "Pods/Target Support Files/Pods-Classpath/Pods-Classpath.release.xcconfig"; sourceTree = "<group>"; };
 		3E1AE1EC2316266F00CC7EBA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		3E932F2C23C5AC3A0046DDCD /* Location.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Location.gpx; sourceTree = "<group>"; };
-		3ED9AB9F23C70E5F006DC04E /* Location1.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Location1.gpx; sourceTree = "<group>"; };
+		3E932F2C23C5AC3A0046DDCD /* USA.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = USA.gpx; sourceTree = "<group>"; };
+		3ED9AB9F23C70E5F006DC04E /* India.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = India.gpx; sourceTree = "<group>"; };
 		641EFB1BB216805E3266B46F /* Pods_Classpath.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Classpath.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D0125EF2164B99E00A6CE07 /* FilterVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterVC.swift; sourceTree = "<group>"; };
 		6D0B64DB2122E7B900D4C47D /* BaseCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCell.swift; sourceTree = "<group>"; };
@@ -644,8 +644,8 @@
 				BE75F7282111798100DDC9DB /* LaunchScreen.storyboard */,
 				BE75F72B2111798100DDC9DB /* Info.plist */,
 				3E1AE1EC2316266F00CC7EBA /* GoogleService-Info.plist */,
-				3E932F2C23C5AC3A0046DDCD /* Location.gpx */,
-				3ED9AB9F23C70E5F006DC04E /* Location1.gpx */,
+				3E932F2C23C5AC3A0046DDCD /* USA.gpx */,
+				3ED9AB9F23C70E5F006DC04E /* India.gpx */,
 			);
 			path = Classpath;
 			sourceTree = "<group>";
@@ -1426,7 +1426,7 @@
 				CODE_SIGN_ENTITLEMENTS = Classpath/Classpath.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 8EC5EBSP7P;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1460,7 +1460,7 @@
 				CODE_SIGN_ENTITLEMENTS = Classpath/Classpath.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 8EC5EBSP7P;
 				FRAMEWORK_SEARCH_PATHS = (

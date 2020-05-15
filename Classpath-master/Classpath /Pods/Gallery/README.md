@@ -4,7 +4,7 @@
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License](https://img.shields.io/cocoapods/l/Gallery.svg?style=flat)](http://cocoadocs.org/docsets/Gallery)
 [![Platform](https://img.shields.io/cocoapods/p/Gallery.svg?style=flat)](http://cocoadocs.org/docsets/Gallery)
-![Swift](https://img.shields.io/badge/%20in-swift%204.0-orange.svg)
+![Swift](https://img.shields.io/badge/%20in-swift%205.0-orange.svg)
 
 ## Description
 
@@ -79,11 +79,12 @@ There are lots of customization points in `Config` structs. For example
 Config.Permission.image = UIImage(named: ImageList.Gallery.cameraIcon)
 Config.Font.Text.bold = UIFont(name: FontList.OpenSans.bold, size: 14)!
 Config.Camera.recordLocation = true
+Config.tabsToShow = [.imageTab, .cameraTab]
 ```
 
 ### Video Editor
 
-`Galery` cares more about video with its editing functionalities. We have `VideoEditor` and `AdvancedVideoEditor` to trim, resize, scale and define quality of the selected video
+`Gallery` cares more about video with its editing functionalities. We have `VideoEditor` and `AdvancedVideoEditor` to trim, resize, scale and define quality of the selected video
 
 ```swift
 func galleryController(_ controller: GalleryController, didSelectVideo video: Video) {

@@ -153,7 +153,8 @@ extension ListingDetailsVC: UITableViewDelegate, UITableViewDataSource {
         cell.lblName.text = model.userName
         if(model.profileImage != "")
         {
-            cell.profileImage.sd_setImage(with:URL(string:model.profileImage), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+            let storageRef=Storage.storage().reference(forURL:model.profileImage as String)
+            cell.profileImage.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
         }
         return cell
     }

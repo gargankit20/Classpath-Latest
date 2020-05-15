@@ -11,8 +11,7 @@ class ImagesController: UIViewController {
   let library = ImagesLibrary()
   var selectedAlbum: Album?
   let once = Once()
-  
-    var cart: Cart
+  let cart: Cart
 
   // MARK: - Init
 
@@ -30,7 +29,7 @@ class ImagesController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+
     setup()
   }
 
@@ -41,9 +40,9 @@ class ImagesController: UIViewController {
 
     view.addSubview(gridView)
 
-    addChildViewController(dropdownController)
+    addChild(dropdownController)
     gridView.insertSubview(dropdownController.view, belowSubview: gridView.topView)
-    dropdownController.didMove(toParentViewController: self)
+    dropdownController.didMove(toParent: self)
 
     gridView.bottomView.addSubview(stackView)
 
@@ -219,25 +218,19 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
     return CGSize(width: size, height: size)
   }
 
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        let item = items[(indexPath as NSIndexPath).item]
-        
-        if cart.images.contains(item) {
-            cart.remove(item)
-        } else {
-            if cart.images.count < 4 {
-                if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
-                    cart.add(item)
-                }
-            }else{
-                print("Cart is full:\(cart.images.count)")
-            }
-        }
-        
-        configureFrameViews()
-        
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    let item = items[(indexPath as NSIndexPath).item]
+
+    if cart.images.contains(item) {
+      cart.remove(item)
+    } else {
+      if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+        cart.add(item)
+      }
     }
+
+    configureFrameViews()
+  }
 
   func configureFrameViews() {
     for case let cell as ImageCell in gridView.collectionView.visibleCells {

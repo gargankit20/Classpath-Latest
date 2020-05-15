@@ -340,7 +340,8 @@ extension RegistrationDetailVC :  UITableViewDelegate, UITableViewDataSource
         
         cell.btnregistredBy.setTitle(model.registeredBy, for: .normal)
         if model.regUserPic != "" {
-            cell.imgList.sd_setImage(with:URL(string:model.regUserPic), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+            let storageRef=Storage.storage().reference(forURL:model.regUserPic)
+            cell.imgList.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
         }else{
             cell.imgList.image = #imageLiteral(resourceName: "ic_profile_default")
         }
@@ -525,7 +526,7 @@ extension RegistrationDetailVC :  UITableViewDelegate, UITableViewDataSource
             self.getRegistrationRequest()
             self.delegate.requestHandleReload()
             
-            let custAlert = customAlertView(title: "Message", message: "Your invoice was successfully sent to the user. We will “confirm” your appointment once the user has successfully submitted the payment", btnTitle: "OK")
+            let custAlert = customAlertView(title: "Invoice sent", message: "We will confirm your appointment once your client has successfully submitted payment.", btnTitle: "OK")
             custAlert.onBtnSelected = {(Value:String) in
             }
             custAlert.show(animated: true)
@@ -540,12 +541,12 @@ extension RegistrationDetailVC :  UITableViewDelegate, UITableViewDataSource
             
             var day = ""
             if model.dateString == Date().localDateStringOnlyDate() {
-                day = "Today"
+                day = "today"
             }else if model.dateString == temp{
-                day = "Tomorrow"
+                day = "tomorrow"
             }
             
-            let msg = "Hi \(model.registeredBy)! You request to attend \(self.modelRequest.title) \(day) at \(model.dateString + " " + model.slot_selected) is approved. Submit payment ASAP to confirm"
+            let msg = "Hey "+model.registeredBy.trimmingCharacters(in:.whitespacesAndNewlines)+"! Your request to attend "+self.modelRequest.title.trimmingCharacters(in:.whitespacesAndNewlines)+" "+day+" "+model.dateString.trimmingCharacters(in:.whitespacesAndNewlines)+" from "+model.slot_selected.trimmingCharacters(in:.whitespacesAndNewlines)+" is approved. Submit payment to confirm."
             let regID = model.registrationID
             self.message = msg
             self.registrationID = regID
@@ -657,7 +658,8 @@ extension RegistrationDetailVC :  UITableViewDelegate, UITableViewDataSource
                     }
                     
                     
-                    var message = "Hi \(model.registeredBy)! \nYour registration for listing \"\(self.modelRequest.title)\" with timeslot \(model.dateString + " " + model.slot_selected) is Rejected."
+                    var message = "Hey "+model.registeredBy.trimmingCharacters(in:.whitespacesAndNewlines)+"! Your registration for "+self.modelRequest.title.trimmingCharacters(in:.whitespacesAndNewlines)+" on "+model.dateString.trimmingCharacters(in:.whitespacesAndNewlines)+" from "+model.slot_selected.trimmingCharacters(in:.whitespacesAndNewlines)+" is rejected."
+                    
                     if model.status == "Confirmed" {
                         message += " Your money will be securely refund to your account within & working days"
                         self.cancelAppointwithRefund(message:message, model:model)
@@ -708,15 +710,15 @@ extension RegistrationDetailVC :  UITableViewDelegate, UITableViewDataSource
     }
     
     @objc func handleApprove(sender: UIButton){
-        let v = UIView(frame: CGRect(x: 0, y: -5, width: 310, height: 55))
-        let lbl = UILabel(frame: CGRect(x: 10, y: 0, width: 290, height: 55))
-        lbl.text = "Once their payment is received your appointment will be confirmed"
-        lbl.textColor = textThemeColor
-        lbl.numberOfLines = 0
-        lbl.textAlignment = .center
-        lbl.font = UIFont(name: "SFProDisplay-Regular", size: 14)
-        v.addSubview(lbl)
-        let custAlert = customAlertView(title: "Confirm Approval", message: "Great, your client will be notified of your approval.", customView: v, leftBtnTitle: "Cancel", rightBtnTitle: "Confirm", image: #imageLiteral(resourceName: "ic_done"))
+        //let v = UIView(frame: CGRect(x: 0, y: -5, width: 310, height: 55))
+        //let lbl = UILabel(frame: CGRect(x: 10, y: 0, width: 290, height: 55))
+        //lbl.text = "Once their payment is received your appointment will be confirmed"
+        //lbl.textColor = textThemeColor
+        //lbl.numberOfLines = 0
+        //lbl.textAlignment = .center
+        //lbl.font = UIFont(name: "SFProDisplay-Regular", size: 14)
+        //v.addSubview(lbl)
+        let custAlert = customAlertView(title: "Confirm Approval", message: "Do you want to proceed?", customView:UIView(), leftBtnTitle: "Cancel", rightBtnTitle: "Confirm", image: #imageLiteral(resourceName: "ic_done"))
         
         custAlert.onRightBtnSelected = {(Value:String) in
             custAlert.dismiss(animated: true)
@@ -783,7 +785,7 @@ extension RegistrationDetailVC :  UITableViewDelegate, UITableViewDataSource
                 })
             })
     
-            let msg = "Hi \(model.registeredBy)! Your registration for listing \(self.modelRequest.title) with timeslot \(model.dateString + " " + model.slot_selected) is Rejected"
+            var msg = "Hey "+model.registeredBy.trimmingCharacters(in:.whitespacesAndNewlines)+"! Your registration for "+self.modelRequest.title.trimmingCharacters(in:.whitespacesAndNewlines)+" on "+model.dateString.trimmingCharacters(in:.whitespacesAndNewlines)+" from "+model.slot_selected.trimmingCharacters(in:.whitespacesAndNewlines)+" is rejected."
             let regID = model.registrationID
             self.message = msg
             self.registrationID = regID

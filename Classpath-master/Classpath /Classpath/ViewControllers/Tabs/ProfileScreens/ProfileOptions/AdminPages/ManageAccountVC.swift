@@ -218,7 +218,8 @@ class ManageAccountVC: UIViewController,UITableViewDelegate,UITableViewDataSourc
         }
         
         if imageString != ""{
-            cell.imgView.sd_setImage(with:URL(string:imageString), placeholderImage:placeHolder)
+            let storageRef=Storage.storage().reference(forURL:imageString as String)
+            cell.imgView.sd_setImage(with:storageRef, placeholderImage:placeHolder)
         }else {
            cell.imgView.image = placeHolder
         }

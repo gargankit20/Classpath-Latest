@@ -61,7 +61,8 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
             cell.imgList.image = #imageLiteral(resourceName: "ic_listing_default")
             let image = model.images[0] as! String
             if image != "" {
-                cell.imgList.sd_setImage(with:URL(string:image), placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
+                let storageRef=Storage.storage().reference(forURL:image)
+                cell.imgList.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
             }else{
                 cell.imgList.image = #imageLiteral(resourceName: "ic_listing_default")
             }
@@ -77,7 +78,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
 //            //cell.btn_Review.addTarget(self, action:#selector(onClick_WriteReview(sender:)), for: .touchUpInside)
 //            if(cell.lblStatus.text == "APPROVED") || (cell.lblStatus.text == "CONFIRMED"){
             
-                let dateArr = model.strDate.components(separatedBy: " at")
+                let dateArr = model.strDate.components(separatedBy: " from")
                 var timeSlot:String = dateArr[1]
                 timeSlot = timeSlot.trimmingCharacters(in: .whitespaces)
                 
@@ -106,7 +107,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
 //                }else{
 //                    cell.btnPay.isHidden = false
 //                }
-                if model.strDate == "Fri,Jan 18 at 5:00 PM to 6:00 PM" {
+                if model.strDate == "Fri, Jan 18 from 5:00 PM to 6:00 PM" {
                     print(cell.lblStatus.text!)
                 }
                 if currentTime > startdate{
@@ -232,7 +233,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
     }
     
     @objc func payDone() {
-       let custAlert = customAlertView(title: "Payment successfully processed", message: "All set. An email receipt will be sent out. Remember to Click on the share icon to share. Tap on the timeframe to add to your calendar.", btnTitle: "OK")
+       let custAlert = customAlertView(title: "Payment successful", message: "You're all set. Tap the time slot to add the appointment to your calendar.", btnTitle: "OK")
         custAlert.show(animated: true)
     }
     //MARK: Submit Review actions
@@ -240,7 +241,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
         if sender.title(for: .normal) == "Submit Review" {
             if let model = self.arr.object(at: sender.tag) as? BookingModel{
                 
-                let dateArr = model.strDate.components(separatedBy: " at")
+                let dateArr = model.strDate.components(separatedBy: " from")
                 var timeSlot:String = dateArr[1]
                 timeSlot = timeSlot.trimmingCharacters(in: .whitespaces)
                 
@@ -273,7 +274,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
                         
                         if model.listingStatus == "CONFIRMED"{
                             let v = UIView()
-                            let custAlert = customAlertView.init(title: "Message", message: "Did you attend \(listingTitle) on \(listTimeframe)?", customView: v, leftBtnTitle: "No", rightBtnTitle: "Yes", image: #imageLiteral(resourceName: "ic_done"))
+                            let custAlert = customAlertView.init(title: "Message", message: "Did you attend "+listingTitle.trimmingCharacters(in:.whitespacesAndNewlines)+" on "+listTimeframe.trimmingCharacters(in:.whitespacesAndNewlines)+"?", customView: v, leftBtnTitle: "No", rightBtnTitle: "Yes", image: #imageLiteral(resourceName: "ic_done"))
                             custAlert.onRightBtnSelected = { (Value: String) in
                                 custAlert.dismiss(animated: true)
                                 self.userAttendenceStatus(isAttended:true, tag: sender.tag)
@@ -450,7 +451,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
             if (granted) && (error == nil) {
                 if let model = self.arr.object(at: tagIndex) as? BookingModel{
                     
-                    let dateArr = model.strDate.components(separatedBy: " at")
+                    let dateArr = model.strDate.components(separatedBy: " from")
                     var timeSlot:String = dateArr[1]
                     timeSlot = timeSlot.trimmingCharacters(in: .whitespaces)
                     
@@ -502,7 +503,7 @@ extension BookingVC: UITableViewDelegate,UITableViewDataSource {
             notification.body = "Your appointment schedule for now"
             notification.sound = UNNotificationSound.default
             
-            let dateArr = model.strDate.components(separatedBy: "at")
+            let dateArr = model.strDate.components(separatedBy: "from")
             var strTimeslot:String = dateArr[1]
             strTimeslot = strTimeslot.trimmingCharacters(in: .whitespaces)
             

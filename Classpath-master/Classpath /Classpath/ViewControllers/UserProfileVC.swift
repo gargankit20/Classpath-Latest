@@ -101,11 +101,13 @@ class UserProfileVC: UIViewController {
         self.view.layoutIfNeeded()
         if(snapUtils.userModel.profilePic != "")
         {
-            profile_image.sd_setImage(with:URL(string:snapUtils.userModel.profilePic), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+            let storageRef=Storage.storage().reference(forURL:snapUtils.userModel.profilePic as String)
+            profile_image.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
         }
         if(snapUtils.userModel.coverPic != "")
         {
-            cover_image.sd_setImage(with:URL(string:snapUtils.userModel.coverPic), placeholderImage:#imageLiteral(resourceName: "ic_cover_default"))
+            let storageRef=Storage.storage().reference(forURL:snapUtils.userModel.coverPic as String)
+            cover_image.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_cover_default"))
         }
         if snapUtils.userModel.Verification != ""{
                self.lblPhone.text = "Phone Verified"

@@ -189,7 +189,8 @@ class NotificationsVC: UIViewController,UITableViewDelegate,UITableViewDataSourc
         var profileImg = String()
         profileImg = model.ProfilePic
         if profileImg != "" {
-            cell.imgProfileView.sd_setImage(with:URL(string:profileImg), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+            let storageRef=Storage.storage().reference(forURL:profileImg)
+            cell.imgProfileView.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
         }else{
             cell.imgProfileView.image = #imageLiteral(resourceName: "ic_profile_default")
         }

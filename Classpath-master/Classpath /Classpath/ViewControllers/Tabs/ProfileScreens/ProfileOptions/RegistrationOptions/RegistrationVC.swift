@@ -332,7 +332,8 @@ extension RegistrationVC:  UITableViewDelegate, UITableViewDataSource
         cell.lblPendingreq.attributedText = model.pending_request
         let image = model.images[0] as! String
         if image != "" {
-            cell.imgList.sd_setImage(with:URL(string:image), placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
+            let storageRef=Storage.storage().reference(forURL:image)
+            cell.imgList.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_listing_default"))
         }else{
             cell.imgList.image = #imageLiteral(resourceName: "ic_listing_default")
         }

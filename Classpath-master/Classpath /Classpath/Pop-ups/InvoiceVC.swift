@@ -128,7 +128,22 @@ class InvoiceVC: UIViewController,NVActivityIndicatorViewable {
     func setData() {
         lblListingName.text = model.title
         lblOwnerName.text = model.listingOwnerName
-        lblLocation.text = model.listingAddress
+        
+        let addressComponents=model.listingAddress.components(separatedBy:",")
+        
+        var temp=""
+        
+        for i in 0..<addressComponents.count
+        {
+            if i==2
+            {
+                temp+=","
+            }
+            
+            temp+=addressComponents[i]
+        }
+        
+        lblLocation.text = temp
         lblDescription.text = model.listing_description
         lblUsername.text = model.userName
         lblUserNumber.text = userNumber
@@ -146,7 +161,7 @@ class InvoiceVC: UIViewController,NVActivityIndicatorViewable {
         
         lblTotalCost.text = String(format: "$%.2f", arguments: [Double(cost)! * Double(model.ticketsCount)])
         
-        let dateArr = model.strDate.components(separatedBy: " at")
+        let dateArr = model.strDate.components(separatedBy: " from")
         var bookingTime:String = dateArr[1]
         bookingTime = bookingTime.trimmingCharacters(in: .whitespaces)
         lblAppointmentTime.text = bookingTime
@@ -166,6 +181,8 @@ class InvoiceVC: UIViewController,NVActivityIndicatorViewable {
         let payViewController = self.storyboard?.instantiateViewController(withIdentifier: "PayViewController") as! PayViewController
         payViewController.totalCost = self.lblTotalCost.text!
         payViewController.serviceName = self.serviceName
+        payViewController.purchaseDescription = "Payment for "+serviceName+" at "+model.title+" on "+lblAppointmentDate.text!+" from "+lblAppointmentTime.text!
+        payViewController.numberOfTickets = String(model.ticketsCount)
         payViewController.cardInfo =  self.cardInfo
         payViewController.isInstantPay = self.isInstantPay
         payViewController.merchantId = self.merchantId

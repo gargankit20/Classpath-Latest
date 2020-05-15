@@ -232,7 +232,7 @@ class AddServiceVC: UIViewController,UITextFieldDelegate,UIGestureRecognizerDele
                                         keyServicePolicy: txtServicePolicy.text!,
                                         keyInstantBook: isInstantBook]
             print(Note)
-            let childUpdates = ["/\(nodeService)/\(snapUtils.currentUserModel.userId)/\(key)": Note]
+            let childUpdates = ["/\(nodeService)/\(snapUtils.currentUserModel.userId)/\(key ?? "")": Note]
             
             self.ref.updateChildValues(childUpdates)
             

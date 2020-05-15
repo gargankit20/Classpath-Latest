@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-#import "FIRMessagingReceiver.h"
+#import "Firebase/Messaging/FIRMessagingReceiver.h"
 
-#import <UIKit/UIKit.h>
+#import <FirebaseMessaging/FIRMessaging.h>
 
-#import "FIRMessaging.h"
-#import "FIRMessaging_Private.h"
-#import "FIRMessagingLogger.h"
+#import "Firebase/Messaging/FIRMessagingLogger.h"
+#import "Firebase/Messaging/FIRMessagingUtilities.h"
+#import "Firebase/Messaging/FIRMessaging_Private.h"
 
 static NSString *const kUpstreamMessageIDUserInfoKey = @"messageID";
 static NSString *const kUpstreamErrorUserInfoKey = @"error";
-
-// Copied from Apple's header in case it is missing in some cases.
-#ifndef NSFoundationVersionNumber_iOS_9_x_Max
-#define NSFoundationVersionNumber_iOS_9_x_Max 1299
-#endif
 
 static int downstreamMessageID = 0;
 
@@ -41,25 +36,20 @@ static int downstreamMessageID = 0;
     messageID = [[self class] nextMessageID];
   }
 
-  if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_9_x_Max) {
-    // Use delegate method for iOS 10
-    [self scheduleIos10NotificationForMessage:message withIdentifier:messageID];
-  } else {
-    // Post notification directly to AppDelegate handlers. This is valid pre-iOS 10.
-    [self scheduleNotificationForMessage:message];
-  }
+  [self handleDirectChannelMessage:message withIdentifier:messageID];
 }
 
 - (void)willSendDataMessageWithID:(NSString *)messageID error:(NSError *)error {
   NSNotification *notification;
   if (error) {
-    NSDictionary *userInfo = @{
-      kUpstreamMessageIDUserInfoKey : [messageID copy],
-      kUpstreamErrorUserInfoKey : error
-    };
+    NSDictionary *userInfo =
+        @{kUpstreamMessageIDUserInfoKey : [messageID copy], kUpstreamErrorUserInfoKey : error};
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     notification = [NSNotification notificationWithName:FIRMessagingSendErrorNotification
                                                  object:nil
                                                userInfo:userInfo];
+#pragma clang diagnostic pop
     [[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
     FIRMessagingLoggerDebug(kFIRMessagingMessageCodeReceiver000,
                             @"Fail to send upstream message: %@ error: %@", messageID, error);
@@ -73,68 +63,39 @@ static int downstreamMessageID = 0;
   // invoke the callbacks asynchronously
   FIRMessagingLoggerDebug(kFIRMessagingMessageCodeReceiver002, @"Did send upstream message: %@",
                           messageID);
-  NSNotification * notification =
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  NSNotification *notification =
       [NSNotification notificationWithName:FIRMessagingSendSuccessNotification
                                     object:nil
-                                  userInfo:@{ kUpstreamMessageIDUserInfoKey : [messageID copy] }];
-
+                                  userInfo:@{kUpstreamMessageIDUserInfoKey : [messageID copy]}];
+#pragma clang diagnostic pop
   [[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 }
 
 - (void)didDeleteMessagesOnServer {
   FIRMessagingLoggerDebug(kFIRMessagingMessageCodeReceiver003,
                           @"Will send deleted messages notification");
-  NSNotification * notification =
-      [NSNotification notificationWithName:FIRMessagingMessagesDeletedNotification
-                                    object:nil];
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  NSNotification *notification =
+      [NSNotification notificationWithName:FIRMessagingMessagesDeletedNotification object:nil];
   [[NSNotificationQueue defaultQueue] enqueueNotification:notification postingStyle:NSPostASAP];
 }
 
 #pragma mark - Private Helpers
-// As the new UserNotifications framework in iOS 10 doesn't support constructor/mutation for
-// UNNotification object, FCM can't inject the message to the app with UserNotifications framework.
-// Define our own protocol, which means app developers need to implement two interfaces to receive
-// display notifications and data messages respectively for devices running iOS 10 or above. Devices
-// running iOS 9 or below are not affected.
-- (void)scheduleIos10NotificationForMessage:(NSDictionary *)message
-                             withIdentifier:(NSString *)messageID {
-  FIRMessagingRemoteMessage *wrappedMessage = [[FIRMessagingRemoteMessage alloc] init];
-  // TODO: wrap title, body, badge and other fields
-  wrappedMessage.appData = [message copy];
-  [self.delegate receiver:self receivedRemoteMessage:wrappedMessage];
-}
-
-- (void)scheduleNotificationForMessage:(NSDictionary *)message {
-  SEL newNotificationSelector =
-      @selector(application:didReceiveRemoteNotification:fetchCompletionHandler:);
-  SEL oldNotificationSelector = @selector(application:didReceiveRemoteNotification:);
-
-  dispatch_async(dispatch_get_main_queue(), ^{
-    id<UIApplicationDelegate> appDelegate = [[UIApplication sharedApplication] delegate];
-    if ([appDelegate respondsToSelector:newNotificationSelector]) {
-      // Try the new remote notification callback
-      [appDelegate application:[UIApplication sharedApplication]
-  didReceiveRemoteNotification:message
-        fetchCompletionHandler:^(UIBackgroundFetchResult result) {}];
-
-    } else if ([appDelegate respondsToSelector:oldNotificationSelector]) {
-      // Try the old remote notification callback
+- (void)handleDirectChannelMessage:(NSDictionary *)message withIdentifier:(NSString *)messageID {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      [appDelegate application:
-       [UIApplication sharedApplication] didReceiveRemoteNotification:message];
+  FIRMessagingRemoteMessage *wrappedMessage = [[FIRMessagingRemoteMessage alloc] init];
+  wrappedMessage.appData = [message copy];
+  wrappedMessage.messageID = messageID;
+  [self.delegate receiver:self receivedRemoteMessage:wrappedMessage];
 #pragma clang diagnostic pop
-    } else {
-      FIRMessagingLoggerError(kFIRMessagingMessageCodeReceiver005,
-                              @"None of the remote notification callbacks implemented by "
-                              @"UIApplicationDelegate");
-    }
-  });
 }
 
 + (NSString *)nextMessageID {
-  @synchronized (self) {
+  @synchronized(self) {
     ++downstreamMessageID;
     return [NSString stringWithFormat:@"gcm-%d", downstreamMessageID];
   }

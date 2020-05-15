@@ -276,6 +276,9 @@ let STRIPE_PUBLISHABLE_KEY = "pk_live_OitqrLwPZDmicQgfxeY0dm6d"
 let STRIPE_CLIENT_ID="ca_D7ZrCwYWNy98OU7VWIefUOk35n1LDkyX"
 //let STRIPE_CLIENT_ID="ca_D7Zr5xqbyBjXleAz4mP5IN3g5C5E8kdm"
 
+//let AD_UNIT_ID="ca-app-pub-7666000398456991/6142401906"
+let AD_UNIT_ID_TEST="ca-app-pub-3940256099942544/1033173712"
+
 struct INSTAGRAM_IDS {
     
     static let INSTAGRAM_AUTHURL = "https://api.instagram.com/oauth/authorize/"

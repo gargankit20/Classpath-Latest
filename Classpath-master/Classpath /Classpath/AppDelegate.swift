@@ -19,17 +19,23 @@ import FirebaseMessaging
 import StoreKit
 import Stripe
 import CoreLocation
+import GoogleMobileAds
+import AdSupport
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate,GIDSignInDelegate,UNUserNotificationCenterDelegate, MessagingDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate,GIDSignInDelegate,UNUserNotificationCenterDelegate, MessagingDelegate, GADInterstitialDelegate  {
 
     var window: UIWindow?
-
+    var interstitial:GADInterstitial!
+    
     var restrictRotation:UIInterfaceOrientationMask = .portrait
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        STPPaymentConfiguration.shared().publishableKey = STRIPE_PUBLISHABLE_KEY
+        GADMobileAds.sharedInstance().start(completionHandler:nil)
+        
+        STPAPIClient.shared().publishableKey=STRIPE_PUBLISHABLE_KEY
+        //STPPaymentConfiguration.shared().publishableKey = STRIPE_PUBLISHABLE_KEY
 
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         GIDSignIn.sharedInstance().delegate = self
@@ -61,10 +67,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate,GIDSignInDelegate,UNUserNo
         UINavigationBar.appearance().shadowImage = UIImage()
         UINavigationBar.appearance().setBackgroundImage(UIImage(), for: .default)
         
+        createAndLoadInterstitial()
         
         return true
     }
-   
+    
+    func createAndLoadInterstitial()
+    {
+        let id=ASIdentifierManager.shared().advertisingIdentifier
+        let md5id=id.uuidString.md5
+        interstitial=GADInterstitial(adUnitID:AD_UNIT_ID_TEST)
+        interstitial.delegate=self
+        let request=GADRequest()
+        request.testDevices=[md5id!]
+        interstitial.load(request)
+    }
+    
+    func interstitialDidDismissScreen(_ ad:GADInterstitial)
+    {
+        createAndLoadInterstitial()
+    }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
          print("Firebase registration token: \(fcmToken)")
@@ -164,6 +186,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate,GIDSignInDelegate,UNUserNo
     }
 }
 
+extension String
+{
+    var md5:String!
+    {
+        let str=self.cString(using:String.Encoding.utf8)
+        let strLen=CC_LONG(self.lengthOfBytes(using:String.Encoding.utf8))
+        let digestLen=Int(CC_MD5_DIGEST_LENGTH)
+        let result=UnsafeMutablePointer<CUnsignedChar>.allocate(capacity:digestLen)
+
+        CC_MD5(str!, strLen, result)
+
+        let hash=NSMutableString()
+        for i in 0..<digestLen
+        {
+            hash.appendFormat("%02x", result[i])
+        }
+
+        result.deallocate(capacity:digestLen)
+
+        return String(format:hash as String)
+    }
+}
 
 
 

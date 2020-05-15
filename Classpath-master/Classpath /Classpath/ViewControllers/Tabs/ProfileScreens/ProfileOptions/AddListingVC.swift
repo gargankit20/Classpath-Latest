@@ -854,9 +854,9 @@ class AddListingVC: UIViewController,UITextFieldDelegate,UIGestureRecognizerDele
             }else{
                
                 let key = self.ref.child(nodeListings).childByAutoId().key
-                let childUpdates = ["/\(nodeListings)/\(key)": self.parameter]
+                let childUpdates = ["/\(nodeListings)/\(key ?? "")": self.parameter]
                 self.ref.updateChildValues(childUpdates)
-                snapUtils.sendMultipleNotifications(listingName:self.txtTitle.text!, listingId: key)
+                snapUtils.sendMultipleNotifications(listingName:self.txtTitle.text!, listingId: key!)
                 self.updateOwnerBadge()
             }
             
@@ -1057,7 +1057,7 @@ class AddListingVC: UIViewController,UITextFieldDelegate,UIGestureRecognizerDele
         
         if(txtSunday.tags.count == 0 || txtMonday.tags.count == 0  || txtTuesday.tags.count == 0  || txtWednesday.tags.count == 0  || txtThursday.tags.count == 0  || txtFriday.tags.count == 0  || txtSaturday.tags.count == 0  )
         {
-            let custAlert = customAlertView(title: "Error", message: "Select a timeframe and service for each day. Check \"N/A\" if applicable", btnTitle: "OK")
+            let custAlert = customAlertView(title: "Service Missing", message: "Be sure to add at least one service to each timeframe or check the N/A box.", btnTitle: "OK")
             custAlert.show(animated: true)
             return false
         }
@@ -1066,7 +1066,7 @@ class AddListingVC: UIViewController,UITextFieldDelegate,UIGestureRecognizerDele
         {
             if monServiceNotSelected || tueServiceNotSelected || wedServiceNotSelected || thuServiceNotSelected || friServiceNotSelected || satServiceNotSelected || sunServiceNotSelected
             {
-                let custAlert=customAlertView(title:"Error", message: "You may have to create a service first. Make sure to associate a service to each time slot. If unavailable, check the box", btnTitle:"OK")
+                let custAlert=customAlertView(title:"Service Missing", message: "Be sure to add at least one service to each timeframe or check the N/A box.", btnTitle:"OK")
                 custAlert.show(animated:true)
                 return false
             }
@@ -1372,6 +1372,7 @@ extension AddListingVC:addHoursPopUpsDelegate,TLTagsControlDelegate{
     }
     
     func delete(_ tagsControl: TLTagsControl!, tappedAt index: Int, deleteTagText tagText: String!) {
+        let tagText=tagText.trimmingCharacters(in:.whitespacesAndNewlines)
         if tagsControl.tag == 8{
             sunSlotServices.removeObject(forKey: tagText)
         }else if tagsControl.tag == 9{

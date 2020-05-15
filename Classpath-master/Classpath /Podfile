@@ -13,9 +13,9 @@ target 'Classpath' do
   pod 'Firebase/Auth'
   pod 'Firebase/Database'
   pod 'Firebase/Storage'
-  pod 'FBSDKCoreKit'
-  pod 'FBSDKLoginKit'
-  pod 'FBSDKShareKit'
+  pod 'FBSDKCoreKit', '~>4.34.0'
+  pod 'FBSDKLoginKit', '~>4.34.0'
+  pod 'FBSDKShareKit', '~>4.34.0'
   pod 'TwitterKit'
   pod 'SKPhotoBrowser'
   pod 'Gallery'
@@ -24,4 +24,5 @@ target 'Classpath' do
   pod 'STKWebKitViewController'
   pod 'FirebaseUI/Storage'
   pod 'SDWebImage'
+  pod 'Google-Mobile-Ads-SDK', '~>7.41.0'
 end

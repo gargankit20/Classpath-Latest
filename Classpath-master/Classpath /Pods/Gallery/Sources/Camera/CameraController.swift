@@ -166,10 +166,8 @@ class CameraController: UIViewController {
 extension CameraController: CartDelegate {
 
   func cart(_ cart: Cart, didAdd image: Image, newlyTaken: Bool) {
-    if cart.images.count < 5 {
-        cameraView.stackView.reload(cart.images, added: true)
-        refreshView()
-    }
+    cameraView.stackView.reload(cart.images, added: true)
+    refreshView()
   }
 
   func cart(_ cart: Cart, didRemove image: Image) {

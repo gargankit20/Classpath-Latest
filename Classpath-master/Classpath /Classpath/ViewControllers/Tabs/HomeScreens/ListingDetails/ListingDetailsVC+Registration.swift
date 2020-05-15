@@ -473,9 +473,9 @@ extension ListingDetailsVC{
 //            var title = String()
 //            title = self.model.title
             
-            let day = isToday ? "Today":"Tomorrow"
+            let day = isToday ? "today":"tomorrow"
             
-            let msg = "Hi \(self.lblOwner.text!)! \(snapUtils.currentUserModel.userName) is requesting to join your session \(day) at \(self.slotSelected)"
+            let msg = "Hey "+self.lblOwner.text!.trimmingCharacters(in:.whitespacesAndNewlines)+"! "+snapUtils.currentUserModel.userName.trimmingCharacters(in:.whitespacesAndNewlines)+" is requesting to join your session "+day+" from "+self.slotSelected.trimmingCharacters(in:.whitespacesAndNewlines)+"."
 //            "Hi \(self.lblOwner.text!)! \(snapUtils.currentUserModel.userName) has sent request for listing :\(title)"
             var regID = String()
             var listingID = String()
@@ -608,7 +608,7 @@ extension ListingDetailsVC{
         let listingRegisterID = userInstance.key
         
         if isInstantBook {
-           self.getBookingData(param: parameter, listingRegisterID:listingRegisterID)
+            self.getBookingData(param: parameter, listingRegisterID:listingRegisterID!)
         }else {
             if isListingURL == false{
                 
@@ -623,9 +623,9 @@ extension ListingDetailsVC{
 //                title = self.model.title
                 time = NSDate().timeIntervalSince1970
                 
-                let day = isToday ? "Today":"Tomorrow"
+                let day = isToday ? "today":"tomorrow"
                 
-                let msg = "Hi \(self.lblOwner.text!)! \(snapUtils.currentUserModel.userName) is requesting to join your session \(day) at \(self.slotSelected)"
+                let msg = "Hey "+self.lblOwner.text!.trimmingCharacters(in:.whitespacesAndNewlines)+"! "+snapUtils.currentUserModel.userName.trimmingCharacters(in:.whitespacesAndNewlines)+" is requesting to join your session "+day+" from "+self.slotSelected.trimmingCharacters(in:.whitespacesAndNewlines)+"."
 //                "Hi \(self.lblOwner.text!)! \(snapUtils.currentUserModel.userName) has sent request for listing :\(title)"
                 var regID = String()
                 var listingID = String()
@@ -666,7 +666,7 @@ extension ListingDetailsVC{
                             
                             bookingMod.weekDay = k.dayOfWeek() ?? ""
                             bookingMod.appoint_date = k
-                            bookingMod.strDate = utils.convertDateToString(m, format: "E,MMM d") + " at \(start) to \(end)"
+                            bookingMod.strDate = utils.convertDateToString(m, format: "E, MMM d") + " from \(start) to \(end)"
                             bookingMod.dateReminder = utils.convertDateToString(m, format: "MM-dd-yyyy")
                             bookingMod.listingStatus = "PENDING"
                             bookingMod.ticketsCount = self.ticketsCount
@@ -719,7 +719,7 @@ extension ListingDetailsVC{
     
     @objc func payDone(){
         btnRegister.setTitle("Request a session", for: .normal)
-        let custAlert = customAlertView(title: "Payment successfully processed", message: "All set. An email receipt will be sent out. Remember to Click on the share icon to share. Tap on the timeframe to add to your calendar.", btnTitle: "OK")
+        let custAlert = customAlertView(title: "Payment successful", message: "You're all set. Tap the time slot to add the appointment to your calendar.", btnTitle: "OK")
         custAlert.onBtnSelected = { (Value: String) in
             custAlert.dismiss(animated: true)
             self.navigateToBookingTab()

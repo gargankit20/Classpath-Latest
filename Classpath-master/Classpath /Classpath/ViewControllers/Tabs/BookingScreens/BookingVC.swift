@@ -178,7 +178,7 @@ class BookingVC: UIViewController,NVActivityIndicatorViewable,UNUserNotification
                                     model.weekDay = k.dayOfWeek() ?? ""
                                     model.appoint_date = k
                                     
-                                    model.strDate = utils.convertDateToString(m, format: "E,MMM d") + " at \(start) to \(end)"
+                                    model.strDate = utils.convertDateToString(m, format: "E, MMM d") + " from \(start) to \(end)"
                                     model.dateReminder = i as! String
                                     if model2.listingURL == "" {
                                         model.listingStatus = "CANCELLED"
@@ -237,7 +237,7 @@ class BookingVC: UIViewController,NVActivityIndicatorViewable,UNUserNotification
                                         
                                         model.weekDay = k.dayOfWeek() ?? ""
                                         model.appoint_date = k
-                                        model.strDate = utils.convertDateToString(m, format: "E,MMM d") + " at \(start) to \(end)"
+                                        model.strDate = utils.convertDateToString(m, format: "E, MMM d") + " from \(start) to \(end)"
                                         model.dateReminder = utils.convertDateToString(m, format: "MM-dd-yyyy")
                                         
                                         model.requestTime = model2.requestTime
@@ -309,7 +309,7 @@ class BookingVC: UIViewController,NVActivityIndicatorViewable,UNUserNotification
                                         let m = utils.convertStringToDate(i as! String, dateFormat: "MM-dd-yyyy")
                                         model.weekDay = k.dayOfWeek() ?? ""
                                         model.appoint_date = k
-                                        model.strDate = utils.convertDateToString(m, format: "E,MMM d") + " at \(start) to \(end)"
+                                        model.strDate = utils.convertDateToString(m, format: "E, MMM d") + " from \(start) to \(end)"
                                         model.dateReminder = utils.convertDateToString(m, format: "MM-dd-yyyy")
                                         
                                         model.requestTime = model2.requestTime
@@ -376,7 +376,7 @@ class BookingVC: UIViewController,NVActivityIndicatorViewable,UNUserNotification
                                         let m = utils.convertStringToDate(i as! String, dateFormat: "MM-dd-yyyy")
                                         model.weekDay = k.dayOfWeek() ?? ""
                                         model.appoint_date = k
-                                        model.strDate = utils.convertDateToString(m, format: "E,MMM d") + " at \(start) to \(end)"
+                                        model.strDate = utils.convertDateToString(m, format: "E, MMM d") + " from \(start) to \(end)"
                                         model.dateReminder = utils.convertDateToString(m, format: "MM-dd-yyyy")
                                         
                                         model.requestTime = model2.requestTime

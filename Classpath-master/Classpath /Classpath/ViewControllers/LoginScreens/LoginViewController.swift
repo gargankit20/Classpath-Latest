@@ -201,7 +201,7 @@ class LoginViewController: UIViewController,NVActivityIndicatorViewable,UIGestur
                     }
                     
                     let credential = TwitterAuthProvider.credential(withToken: (session?.authToken)!, secret: (session?.authTokenSecret)!)
-                    Auth.auth().signInAndRetrieveData(with: credential) { (user, error) in
+                    Auth.auth().signIn(with: credential) { (user, error) in
                         self.stopAnimating()
                         
                         if error==nil
@@ -325,7 +325,7 @@ class LoginViewController: UIViewController,NVActivityIndicatorViewable,UIGestur
                                 let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                                 
                                 self.startAnimating(sizeProgress, message: nil, type: NVActivityIndicatorType(rawValue: 22)!)
-                                Auth.auth().signInAndRetrieveData(with: credential) { (user, error) in
+                                Auth.auth().signIn(with: credential) { (user, error) in
                                     self.stopAnimating()
                                     
                                     if error==nil
@@ -528,7 +528,7 @@ extension LoginViewController: GIDSignInUIDelegate,GIDSignInDelegate
             guard let authentication = user.authentication else { return }
             let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
                                                            accessToken: authentication.accessToken)
-            Auth.auth().signInAndRetrieveData(with: credential) { (user, error) in
+            Auth.auth().signIn(with: credential) { (user, error) in
                 self.stopAnimating()
                 
                 if error==nil

@@ -8,8 +8,13 @@
 
 #import "STPPaymentIntent.h"
 #import "STPPaymentIntent+Private.h"
+#import "STPPaymentIntentSourceAction.h"
+#import "STPPaymentIntentAction.h"
+#import "STPPaymentIntentLastPaymentError.h"
+#import "STPPaymentMethod+Private.h"
 
 #import "NSDictionary+Stripe.h"
+#import "NSArray+Stripe.h"
 
 @interface STPPaymentIntent ()
 @property (nonatomic, copy, readwrite) NSString *stripeId;
@@ -22,10 +27,15 @@
 @property (nonatomic, copy, readwrite) NSString *currency;
 @property (nonatomic, copy, nullable, readwrite) NSString *stripeDescription;
 @property (nonatomic, assign, readwrite) BOOL livemode;
+@property (nonatomic, strong, nullable, readwrite) STPIntentAction* nextAction;
 @property (nonatomic, copy, nullable, readwrite) NSString *receiptEmail;
-@property (nonatomic, copy, nullable, readwrite) NSURL *returnUrl;
 @property (nonatomic, copy, nullable, readwrite) NSString *sourceId;
+@property (nonatomic, copy, nullable, readwrite) NSString *paymentMethodId;
+@property (nonatomic, nullable, readwrite) STPPaymentMethod *paymentMethod;
 @property (nonatomic, assign, readwrite) STPPaymentIntentStatus status;
+@property (nonatomic, copy, nullable, readwrite) NSArray<NSNumber *> *paymentMethodTypes;
+@property (nonatomic) STPPaymentIntentSetupFutureUsage setupFutureUsage;
+@property (nonatomic, nullable, readwrite) STPPaymentIntentLastPaymentError *lastPaymentError;
 
 @property (nonatomic, copy, nonnull, readwrite) NSDictionary *allResponseFields;
 @end
@@ -49,10 +59,14 @@
                        [NSString stringWithFormat:@"created = %@", self.created],
                        [NSString stringWithFormat:@"currency = %@", self.currency],
                        [NSString stringWithFormat:@"description = %@", self.stripeDescription],
+                       [NSString stringWithFormat:@"lastPaymentError = %@", self.lastPaymentError],
                        [NSString stringWithFormat:@"livemode = %@", self.livemode ? @"YES" : @"NO"],
-                       [NSString stringWithFormat:@"nextSourceAction = %@", self.allResponseFields[@"next_source_action"]],
+                       [NSString stringWithFormat:@"nextAction = %@", self.nextAction],
+                       [NSString stringWithFormat:@"paymentMethodId = %@", self.paymentMethodId],
+                       [NSString stringWithFormat:@"paymentMethod = %@", self.paymentMethod],
+                       [NSString stringWithFormat:@"paymentMethodTypes = %@", [self.allResponseFields stp_arrayForKey:@"payment_method_types"]],
                        [NSString stringWithFormat:@"receiptEmail = %@", self.receiptEmail],
-                       [NSString stringWithFormat:@"returnUrl = %@", self.returnUrl],
+                       [NSString stringWithFormat:@"setupFutureUsage = %@", self.allResponseFields[@"setup_future_usage"]],
                        [NSString stringWithFormat:@"shipping = %@", self.allResponseFields[@"shipping"]],
                        [NSString stringWithFormat:@"sourceId = %@", self.sourceId],
                        [NSString stringWithFormat:@"status = %@", [self.allResponseFields stp_stringForKey:@"status"]],
@@ -68,8 +82,7 @@
     NSArray *components = [clientSecret componentsSeparatedByString:@"_secret_"];
     if (components.count >= 2 && [components[0] hasPrefix:@"pi_"]) {
         return components[0];
-    }
-    else {
+    } else {
         return nil;
     }
 }
@@ -78,9 +91,9 @@
 
 + (STPPaymentIntentStatus)statusFromString:(NSString *)string {
     NSDictionary<NSString *, NSNumber *> *map = @{
-                                                  @"requires_source": @(STPPaymentIntentStatusRequiresSource),
+                                                  @"requires_payment_method": @(STPPaymentIntentStatusRequiresPaymentMethod),
                                                   @"requires_confirmation": @(STPPaymentIntentStatusRequiresConfirmation),
-                                                  @"requires_source_action": @(STPPaymentIntentStatusRequiresSourceAction),
+                                                  @"requires_action": @(STPPaymentIntentStatusRequiresAction),
                                                   @"processing": @(STPPaymentIntentStatusProcessing),
                                                   @"succeeded": @(STPPaymentIntentStatusSucceeded),
                                                   @"requires_capture": @(STPPaymentIntentStatusRequiresCapture),
@@ -105,8 +118,8 @@
 
 + (STPPaymentIntentConfirmationMethod)confirmationMethodFromString:(NSString *)string {
     NSDictionary<NSString *, NSNumber *> *map = @{
-                                                  @"secret": @(STPPaymentIntentConfirmationMethodSecret),
-                                                  @"publishable": @(STPPaymentIntentConfirmationMethodPublishable),
+                                                  @"automatic": @(STPPaymentIntentConfirmationMethodAutomatic),
+                                                  @"manual": @(STPPaymentIntentConfirmationMethodManual),
                                                   };
 
     NSString *key = string.lowercaseString;
@@ -114,6 +127,23 @@
     return statusNumber.integerValue;
 }
 
++ (STPPaymentIntentSetupFutureUsage)setupFutureUsageFromString:(NSString *)string {
+    NSDictionary<NSString *, NSNumber *> *map = @{
+                                                  @"on_session": @(STPPaymentIntentSetupFutureUsageOnSession),
+                                                  @"off_session": @(STPPaymentIntentSetupFutureUsageOffSession),
+                                                  };
+    
+    NSString *key = string.lowercaseString;
+    NSNumber *statusNumber = map[key] ?: @(STPPaymentIntentSetupFutureUsageUnknown);
+    return statusNumber.integerValue;
+
+}
+
+#pragma mark - Deprecated
+
+- (STPPaymentIntentAction *)nextSourceAction {
+    return self.nextAction;
+}
 
 #pragma mark - STPAPIResponseDecodable
 
@@ -147,14 +177,28 @@
     paymentIntent.currency = currency;
     paymentIntent.stripeDescription = [dict stp_stringForKey:@"description"];
     paymentIntent.livemode = [dict stp_boolForKey:@"livemode" or:YES];
-    // next_source_action is not being parsed. Today type=`authorize_with_url` is the only one
-    // and STPRedirectContext reaches directly into it. Not yet sure how I want to model
-    // this polymorphic object, so keeping it out of the public API.
-    paymentIntent.returnUrl = [dict stp_urlForKey:@"return_url"];
+    NSDictionary *nextActionDict = [dict stp_dictionaryForKey:@"next_action"];
+    paymentIntent.nextAction = [STPIntentAction decodedObjectFromAPIResponse:nextActionDict];
     paymentIntent.receiptEmail = [dict stp_stringForKey:@"receipt_email"];
     // FIXME: add support for `shipping`
     paymentIntent.sourceId = [dict stp_stringForKey:@"source"];
+    NSDictionary *paymentMethodDict = [dict stp_dictionaryForKey:@"payment_method"];
+    if (paymentMethodDict != nil) {
+        paymentIntent.paymentMethod = [STPPaymentMethod decodedObjectFromAPIResponse:paymentMethodDict];
+        paymentIntent.paymentMethodId = paymentIntent.paymentMethod.stripeId;
+    } else {
+        paymentIntent.paymentMethodId = [dict stp_stringForKey:@"payment_method"];
+        paymentIntent.paymentMethod = nil;
+    }
+
+    NSArray<NSString *> *rawPaymentMethodTypes = [[dict stp_arrayForKey:@"payment_method_types"] stp_arrayByRemovingNulls];
+    if (rawPaymentMethodTypes) {
+        paymentIntent.paymentMethodTypes = [STPPaymentMethod typesFromStrings:rawPaymentMethodTypes];
+    }
     paymentIntent.status = [[self class] statusFromString:rawStatus];
+    NSString *rawSetupFutureUsage = [dict stp_stringForKey:@"setup_future_usage"];
+    paymentIntent.setupFutureUsage = rawSetupFutureUsage ? [[self class] setupFutureUsageFromString:rawSetupFutureUsage] : STPPaymentIntentSetupFutureUsageNone;
+    paymentIntent.lastPaymentError = [STPPaymentIntentLastPaymentError decodedObjectFromAPIResponse:[dict stp_dictionaryForKey:@"last_payment_error"]];
 
     paymentIntent.allResponseFields = dict;
 

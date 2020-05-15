@@ -10,8 +10,11 @@
 
 #import "STPAPIResponseDecodable.h"
 #import "STPPaymentIntentEnums.h"
+#import "STPPaymentMethodEnums.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class STPIntentAction, STPPaymentIntentLastPaymentError;
 
 /**
  A PaymentIntent tracks the process of collecting a payment from your customer.
@@ -79,18 +82,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL livemode;
 
 /**
+ If `status == STPPaymentIntentStatusRequiresAction`, this
+ property contains the next action to take for this PaymentIntent.
+*/
+@property (nonatomic, nullable, readonly) STPIntentAction *nextAction;
+
+/**
  Email address that the receipt for the resulting payment will be sent to.
  */
 @property (nonatomic, nullable, readonly) NSString *receiptEmail;
-
-/**
- The URL to redirect your customer back to after they authenticate or cancel their
- payment on the payment method’s app or site.
-
- This should be a URL that your app handles if the PaymentIntent is going to
- be confirmed in your app, and it has a redirect authorization flow.
- */
-@property (nonatomic, nullable, readonly) NSURL *returnUrl;
 
 /**
  The Stripe ID of the Source used in this PaymentIntent.
@@ -98,9 +98,40 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable, readonly) NSString *sourceId;
 
 /**
+ The Stripe ID of the PaymentMethod used in this PaymentIntent.
+ */
+@property (nonatomic, nullable, readonly) NSString *paymentMethodId;
+
+/**
  Status of the PaymentIntent
  */
 @property (nonatomic, readonly) STPPaymentIntentStatus status;
+
+/**
+ The list of payment method types (e.g. `@[@(STPPaymentMethodTypeCard)]`) that this PaymentIntent is allowed to use.
+ */
+@property (nonatomic, nullable, readonly) NSArray<NSNumber *> *paymentMethodTypes;
+
+/**
+ When provided, this property indicates how you intend to use the payment method that your customer provides after the current payment completes. If applicable, additional authentication may be performed to comply with regional legislation or network rules required to enable the usage of the same payment method for additional payments.
+ Use on_session if you intend to only reuse the payment method when the customer is in your checkout flow. Use off_session if your customer may or may not be in your checkout flow.
+ */
+@property (nonatomic, readonly) STPPaymentIntentSetupFutureUsage setupFutureUsage;
+
+/**
+ The payment error encountered in the previous PaymentIntent confirmation.
+ */
+@property (nonatomic, nullable, readonly) STPPaymentIntentLastPaymentError *lastPaymentError;
+
+#pragma mark - Deprecated
+
+/**
+ If `status == STPPaymentIntentStatusRequiresAction`, this
+ property contains the next source action to take for this PaymentIntent.
+ 
+ @deprecated Use nextAction instead
+ */
+@property (nonatomic, nullable, readonly) STPIntentAction *nextSourceAction __attribute__((deprecated("Use nextAction instead", "nextAction")));
 
 @end
 

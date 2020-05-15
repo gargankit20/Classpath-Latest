@@ -513,7 +513,7 @@ class ChattingsVC: UIViewController,NVActivityIndicatorViewable,UIGestureRecogni
         chatsMessagesInstance.setValue(paramchatsMessages)
         addOverserForGettingNewMsgs(chatID : chatId)
         let model = ChatMessagesModel()
-        model.messageId = chatsMessagesInstance.key
+        model.messageId = chatsMessagesInstance.key!
         model.sendby = uid
         model.message = message
         model.timeStamp = timeStamp
@@ -554,7 +554,7 @@ class ChattingsVC: UIViewController,NVActivityIndicatorViewable,UIGestureRecogni
         chatsMessagesInstance.setValue(paramchatsMessages)
         
         let model = ChatMessagesModel()
-        model.messageId = chatsMessagesInstance.key
+        model.messageId = chatsMessagesInstance.key!
         model.sendby = uid
         model.message = message
         model.timeStamp = timeStamp
@@ -834,7 +834,8 @@ extension ChattingsVC :  UITableViewDelegate, UITableViewDataSource
             cell.lblChatMessage.text = userObj.message
             
             if UserImage != ""{
-                cell.imgProfileView.sd_setImage(with:URL(string:UserImage), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+                let storageRef=Storage.storage().reference(forURL:UserImage as String)
+                cell.imgProfileView.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
             }else{
                 cell.imgProfileView.image = #imageLiteral(resourceName: "ic_profile_default")
             }
@@ -864,7 +865,8 @@ extension ChattingsVC :  UITableViewDelegate, UITableViewDataSource
             cell.lblChatMessage.text = userObj.message
             
             if OponentImage != ""{
-                cell.imgProfileView.sd_setImage(with:URL(string:OponentImage), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+                let storageRef=Storage.storage().reference(forURL:self.OponentImage as String)
+                cell.imgProfileView.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
             }else{
                 cell.imgProfileView.image = #imageLiteral(resourceName: "ic_profile_default")
             }

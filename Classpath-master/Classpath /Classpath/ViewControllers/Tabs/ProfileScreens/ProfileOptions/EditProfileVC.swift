@@ -124,11 +124,13 @@ class EditProfileVC: UIViewController,UITextFieldDelegate,UIGestureRecognizerDel
 
         if(snapUtils.currentUserModel.profilePic != "")
         {
-            profile_image.sd_setImage(with:URL(string:snapUtils.currentUserModel.profilePic), placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
+            let storageRef=Storage.storage().reference(forURL:snapUtils.currentUserModel.profilePic as String)
+            profile_image.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_profile_default"))
         }
         if(snapUtils.currentUserModel.coverPic != "")
         {
-            cover_image.sd_setImage(with:URL(string:snapUtils.currentUserModel.coverPic), placeholderImage:#imageLiteral(resourceName: "ic_cover_default"))
+            let storageRef=Storage.storage().reference(forURL:snapUtils.currentUserModel.coverPic as String)
+            cover_image.sd_setImage(with:storageRef, placeholderImage:#imageLiteral(resourceName: "ic_cover_default"))
         }
         if snapUtils.currentUserModel.Verification != ""{
        //     self.lbl_verify.text = "Verified"

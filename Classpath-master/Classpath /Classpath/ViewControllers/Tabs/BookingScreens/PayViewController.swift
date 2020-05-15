@@ -19,9 +19,10 @@ class PayViewController: UIViewController,addCardSet,NVActivityIndicatorViewable
     
     var totalCost = ""
     var serviceName = ""
+    var purchaseDescription = ""
+    var numberOfTickets = ""
     var cardInfo = NSDictionary()
     var merchantId = ""
-    var emailID = ""
     var listingRegisterId = ""
     var model = BookingModel()
     var isInstantPay = false
@@ -118,9 +119,19 @@ class PayViewController: UIViewController,addCardSet,NVActivityIndicatorViewable
         
         print(amount, ownerPayment, stripefee, charges)
         
+        let currentDate=Date()
+        let formatter=DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy"
+        let someDate=formatter.string(from:currentDate)
+        
         let strUrl = "\(BaseURl)/stripe/create_charge.php"
         let params: [String: Any] = ["customer": customer,
                                      "amount": allCents,
+                                     "amountInUSD":String(format:"%.2f", amount),
+                                     "description":purchaseDescription,
+                                     "tickets":numberOfTickets,
+                                     "name":snapUtils.currentUserModel.userName,
+                                     "date":someDate,
                                      "merchant_account" : merchantId,
                                      "merchant_pay_amount" : Int(ownerPayment),
                                      "currency": "usd",

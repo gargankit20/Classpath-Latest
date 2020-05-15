@@ -39,7 +39,17 @@ class WebViewPopUp: UIViewController, WKNavigationDelegate {
             webView.load(request)
         }
     }
-
+    
+    override func viewWillAppear(_ animated:Bool)
+    {
+        let appDelegate=UIApplication.shared.delegate as! AppDelegate
+        
+        if appDelegate.interstitial.isReady
+        {
+            appDelegate.interstitial.present(fromRootViewController:self)
+        }
+    }
+        
     @IBAction func onClick_close(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
